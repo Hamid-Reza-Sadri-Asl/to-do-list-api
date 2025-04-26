@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <title>TODO API Test Panel</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="container" dir="rtl">
+    <h2>TODO API Test Panel</h2>
+
+    <h3> اضافه کردن تسک جدید</h3>
+    <input type="text" id="newTitle" placeholder="عنوان">
+    <textarea id="newDescription" placeholder="توضیحات"></textarea>
+    <button onclick="createTask()">ایجاد تسک</button>
+
+    <h3> دریافت همه تسک‌ها</h3>
+    <button onclick="getAllTasks()">گرفتن همه تسک‌ها</button>
+
+    <h3> دریافت تسک بر اساس ID</h3>
+    <input type="text" id="getId" placeholder="آیدی تسک">
+    <button onclick="getTaskById()">دریافت تسک</button>
+
+    <h3> آپدیت تسک</h3>
+    <input type="text" id="updateId" placeholder="آیدی تسک">
+    <input type="text" id="updateTitle" placeholder="عنوان جدید (اختیاری)">
+    <textarea id="updateDescription" placeholder="توضیح جدید (اختیاری)"></textarea>
+    <button onclick="updateTask()">آپدیت تسک</button>
+
+    <h3> حذف تسک</h3>
+    <input type="text" id="deleteId" placeholder="آیدی تسک">
+    <button onclick="deleteTask()">حذف تسک</button>
+
+    <h3> نتیجه درخواست</h3>
+    <pre id="result"></pre>
+
+    <div class="dark-mode-toggle">
+        <button onclick="toggleDarkMode()">تغییر حالت دارک/لایت</button>
+    </div>
+</div>
+
+<script>
+const API_URL = "http://localhost:5000";
+
+async function createTask() {
+    const title = document.getElementById('newTitle').value;
+    const description = document.getElementById('newDescription').value;
+    const response = await fetch(`${API_URL}/tasks`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({title, description})
+    });
+    const data = await response.json();
+    document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+}
+
+async function getAllTasks() {
+    const response = await fetch(`${API_URL}/tasks`);
+    const data = await response.json();
+    document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+}
+
+async function getTaskById() {
+    const id = document.getElementById('getId').value;
+    const response = await fetch(`${API_URL}/tasks/${id}`);
+    const data = await response.json();
+    document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+}
+
+async function updateTask() {
+    const id = document.getElementById('updateId').value;
+    const title = document.getElementById('updateTitle').value;
+    const description = document.getElementById('updateDescription').value;
+    const updateData = {};
+    if (title) updateData.title = title;
+    if (description) updateData.description = description;
+    
+    const response = await fetch(`${API_URL}/tasks/${id}`, {
+        method: "PUT",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(updateData)
+    });
+    const data = await response.json();
+    document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+}
+
+async function deleteTask() {
+    const id = document.getElementById('deleteId').value;
+    const response = await fetch(`${API_URL}/tasks/${id}`, {
+        method: "DELETE"
+    });
+    const data = await response.json();
+    document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+}
+
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+}
+</script>
+
+</body>
+</html>
